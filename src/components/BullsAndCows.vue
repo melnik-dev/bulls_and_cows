@@ -7,7 +7,10 @@
     </div>
     <p class="notice" v-if="notice">{{ msg }}</p>
     <ul class="nambers">
-      <li class="nambers__item" v-for="(item, i) in nambers" :key="i" :class="classesBull[i]">{{ item }}</li>
+      <li class="nambers__item" :class="{ bullOne: this.bullFlag[0] }">{{ nambers[0] }}</li>
+      <li class="nambers__item" :class="{ bullTwo: this.bullFlag[1] }">{{ nambers[1] }}</li>
+      <li class="nambers__item" :class="{ bullThree: this.bullFlag[2] }">{{ nambers[2] }}</li>
+      <li class="nambers__item" :class="{ bullFour: this.bullFlag[3] }">{{ nambers[3] }}</li>
     </ul>
     <p>{{ inpytArray }}</p>
     <p>{{ inputValue }}</p>
@@ -29,9 +32,8 @@ export default {
       msg: "Ход - четырехзначное число",
       stepMsg: "",
       nambers: "",
-      classesBull: [{ bullOne: this.bullOneisActive }, { bullTwo: this.bullTwoisActive }, { bullThree: this.bullThreeisActive }, { bullFour: this.bullFourisActive }],
+      bullFlag: [{ oneisActive: false }, { twoisActive: false }, { threeisActive: false }, { fourisActive: false }],
       classesCow: ["cowOne", "cowTwo", "cowThree", "cowFour"],
-      bullOneisActive: true,
     };
   },
   methods: {
@@ -54,12 +56,13 @@ export default {
         let cow = 0;
         for (let i = 0; i < 4; i++) {
           if (item[i] == item[i + 1]) {
-            console.log("hf,jn");
             this.msg = "Цифры не должны повторяться";
             return (this.notice = true);
           }
           if (this.randomNumber[i] == item[i]) {
             bull++;
+            this.bullFlag[i] = false;
+            console.log(this.bullFlag);
           }
           for (let j = 0; j < i; j++) {
             if (this.randomNumber[i] == item[j]) {
@@ -67,7 +70,7 @@ export default {
             }
           }
         }
-        this.stepMsg = `${item}: ${bull} бык,    ${cow} коров`;
+        this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
         this.nambers = this.inputValue;
         this.inputValue = "";
         return this.inpytArray.unshift(this.stepMsg);
