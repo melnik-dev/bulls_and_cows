@@ -11,7 +11,7 @@
     <ul class="nambers">
       <li class="nambers__item" v-for="(item, i) in nambersInCircle" :key="i" :class="classesBull[i]">{{ item }}</li>
     </ul>
-    <!-- <p>random Number: {{ randomNumber }}</p> -->
+    <p style="display: none">random Number: {{ randomNumber }}</p>
     <ul class="items">
       <li class="items__value" v-for="(value, i) in inpytArray" :key="i">{{ value }}</li>
     </ul>
