@@ -11,7 +11,7 @@
     <ul class="nambers">
       <li class="nambers__item" v-for="(item, i) in nambersInCircle" :key="i" :class="classesBull[i]">{{ item }}</li>
     </ul>
-    <p>random Number: {{ randomNumber }}</p>
+    <!-- <p>random Number: {{ randomNumber }}</p> -->
     <ul class="items">
       <li class="items__value" v-for="(value, i) in inpytArray" :key="i">{{ value }}</li>
     </ul>
@@ -58,7 +58,34 @@ function numberFromArray() {
   let num = getUniqueNumArray(getRandomNumArray());
   return num[0];
 }
+// Считаем быков
+function bullCount(number, compare) {
+  number = String(number);
+  compare = String(compare);
+  let bull = 0;
 
+  for (let i = 0; i < number.length; i++) {
+    if (number[i] == compare[i]) {
+      bull++;
+    }
+  }
+  return bull;
+}
+// Считаем коров
+function cowCount(number, compare) {
+  number = String(number);
+  compare = String(compare);
+  let cow = 0;
+
+  for (let i = 0; i < number.length; i++) {
+    for (let j = 0; j < number.length; j++) {
+      if (number[i] == compare[j]) {
+        cow++;
+      }
+    }
+  }
+  return cow;
+}
 export default {
   name: "BullsAndCows",
   data() {
@@ -67,7 +94,7 @@ export default {
       inpytArray: [],
       randomNumber: numberFromArray(),
       notice: false,
-      msg: "Ход - четырехзначное число",
+      msg: "",
       stepMsg: "",
       nambersInCircle: "",
       classesBull: [{ "bull-one": this.bullOneisActive }, { bullTwo: this.bullTwoisActive }, { bullThree: this.bullThreeisActive }, { bullFour: this.bullFourisActive }],
@@ -87,6 +114,7 @@ export default {
       }
       // Проверка длины числа
       if (item.length > 4 || item.length < 4) {
+        this.msg = "Ход - четырехзначное число";
         return (this.notice = true);
       }
       // Числа в числе не повторяются
@@ -98,35 +126,25 @@ export default {
       const parsed = parseInt(item);
       // Проверка число на строку
       if (isNaN(parsed)) {
+        this.msg = "Ход - четырехзначное число";
         return (this.notice = true);
       }
-      // Проверка числа
+      // Проверка числа и подсчет
       if (!isNaN(parsed)) {
         this.notice = false;
-        let bull = 0;
-        let cow = 0;
-        for (let i = 0; i < 4; i++) {
-          // Считаем быков
-          if (this.randomNumber[i] == item[i]) {
-            bull++;
-            // Конец игры
-            if (bull === 4) {
-              this.msg = "Ты Победил!";
-              this.notice = true;
+        let bull = bullCount(this.randomNumber, item);
+        let cow = cowCount(this.randomNumber, item);
+        // Конец игры
+        if (bull === 4) {
+          this.msg = "Ты Победил!";
+          this.notice = true;
 
-              this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
-              this.nambersInCircle = this.inputValue;
-              this.inputValue = "";
-              return this.inpytArray.unshift(this.stepMsg);
-            }
-          }
-          // Считаем коров
-          for (let j = 0; j < i; j++) {
-            if (this.randomNumber[i] == item[j]) {
-              cow++;
-            }
-          }
+          this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
+          this.nambersInCircle = this.inputValue;
+          this.inputValue = "";
+          return this.inpytArray.unshift(this.stepMsg);
         }
+
         // Добовляем данные в массив
         this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
         this.nambersInCircle = this.inputValue;
@@ -140,6 +158,7 @@ export default {
       this.randomNumber = numberFromArray();
       this.notice = false;
       this.nambersInCircle = "";
+      this.msg = "";
     },
   },
 };
