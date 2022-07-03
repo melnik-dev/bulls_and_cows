@@ -1,19 +1,17 @@
 <template>
-  <div class="main">
+  <div class="main" @load="getRandomArbitrary">
     <h1 class="title">Быки и коровы</h1>
+    <p class="subtitle">Компьютер уже что-то задумал. Играем!</p>
     <div class="input__wrapper">
-      <input class="input" type="text" v-model="inputValue" />
+      <input class="input" type="text" v-model="inputValue" @keyup.enter="askNumber(inputValue)" />
       <button class="btn" @click="askNumber(inputValue)">Сделать ход</button>
+      <button class="btn" @click="newGame">Новая игра</button>
     </div>
     <p class="notice" v-if="notice">{{ msg }}</p>
     <ul class="nambers">
-      <li class="nambers__item" :class="{ bullOne: this.bullFlag[0] }">{{ nambers[0] }}</li>
-      <li class="nambers__item" :class="{ bullTwo: this.bullFlag[1] }">{{ nambers[1] }}</li>
-      <li class="nambers__item" :class="{ bullThree: this.bullFlag[2] }">{{ nambers[2] }}</li>
-      <li class="nambers__item" :class="{ bullFour: this.bullFlag[3] }">{{ nambers[3] }}</li>
+      <li class="nambers__item" v-for="(item, i) in nambersInCircle" :key="i" :class="classesBull[i]">{{ item }}</li>
     </ul>
-    <p>{{ inpytArray }}</p>
-    <p>{{ inputValue }}</p>
+    <!-- <p>random Number: {{ randomNumber }}</p> -->
     <ul class="items">
       <li class="items__value" v-for="(value, i) in inpytArray" :key="i">{{ value }}</li>
     </ul>
@@ -21,60 +19,146 @@
 </template>
 
 <script>
+// Масив рандомных чисел
+function getRandomNumArray() {
+  let randomNumArray = [];
+  for (let i = 0; i <= 10; i++) {
+    let num = String(Math.floor(Math.random() * (1000 - 9999)) + 9999);
+    randomNumArray.push(num);
+  }
+  return randomNumArray;
+}
+// Уникальность в числе
+function getUniqueNum(num) {
+  num = String(num);
+  let set = new Set();
+
+  for (let i = 0; i < num.length; i++) {
+    set.add(num[i]);
+    if (set.size == 4) {
+      return true;
+    }
+  }
+
+  return false;
+}
+// Масив уникальных из рандомных чисел
+function getUniqueNumArray(array) {
+  let uniqueNumArray = [];
+  for (let i = 0; i < array.length; i++) {
+    let element = array[i];
+    if (getUniqueNum(element)) {
+      uniqueNumArray.push(element);
+    }
+  }
+  return uniqueNumArray;
+}
+// Первое число из масива иникальных чисел
+function numberFromArray() {
+  let num = getUniqueNumArray(getRandomNumArray());
+  return num[0];
+}
+// Считаем быков
+function bullCount(number, compare) {
+  number = String(number);
+  compare = String(compare);
+  let bull = 0;
+
+  for (let i = 0; i < number.length; i++) {
+    if (number[i] == compare[i]) {
+      bull++;
+    }
+  }
+  return bull;
+}
+// Считаем коров
+function cowCount(number, compare) {
+  number = String(number);
+  compare = String(compare);
+  let cow = 0;
+
+  for (let i = 0; i < number.length; i++) {
+    for (let j = 0; j < number.length; j++) {
+      if (number[i] == compare[j]) {
+        cow++;
+      }
+    }
+  }
+  return cow;
+}
 export default {
   name: "BullsAndCows",
   data() {
     return {
       inputValue: "",
-      inpytArray: ["2153: 1 бык, 3 коров"],
-      randomNumber: "2541",
+      inpytArray: [],
+      randomNumber: numberFromArray(),
       notice: false,
-      msg: "Ход - четырехзначное число",
+      msg: "",
       stepMsg: "",
-      nambers: "",
-      bullFlag: [{ oneisActive: false }, { twoisActive: false }, { threeisActive: false }, { fourisActive: false }],
+      nambersInCircle: "",
+      classesBull: [{ "bull-one": this.bullOneisActive }, { bullTwo: this.bullTwoisActive }, { bullThree: this.bullThreeisActive }, { bullFour: this.bullFourisActive }],
       classesCow: ["cowOne", "cowTwo", "cowThree", "cowFour"],
+      bullOneisActive: true,
+      bullTwoisActive: false,
+      bullThreeisActive: false,
+      bullFourisActive: false,
     };
   },
   methods: {
     askNumber(item) {
+      // Проверка первого числа неравно 0
       if (item[0] == 0) {
         this.msg = "0 не может быть первым числом";
         return (this.notice = true);
       }
+      // Проверка длины числа
       if (item.length > 4 || item.length < 4) {
+        this.msg = "Ход - четырехзначное число";
+        return (this.notice = true);
+      }
+      // Числа в числе не повторяются
+      if (!getUniqueNum(item)) {
+        this.msg = "Цифры не должны повторяться";
         return (this.notice = true);
       }
 
       const parsed = parseInt(item);
+      // Проверка число на строку
       if (isNaN(parsed)) {
+        this.msg = "Ход - четырехзначное число";
         return (this.notice = true);
       }
+      // Проверка числа и подсчет
       if (!isNaN(parsed)) {
         this.notice = false;
-        let bull = 0;
-        let cow = 0;
-        for (let i = 0; i < 4; i++) {
-          if (item[i] == item[i + 1]) {
-            this.msg = "Цифры не должны повторяться";
-            return (this.notice = true);
-          }
-          if (this.randomNumber[i] == item[i]) {
-            bull++;
-            this.bullFlag[i] = false;
-            console.log(this.bullFlag);
-          }
-          for (let j = 0; j < i; j++) {
-            if (this.randomNumber[i] == item[j]) {
-              cow++;
-            }
-          }
+        let bull = bullCount(this.randomNumber, item);
+        let cow = cowCount(this.randomNumber, item);
+        // Конец игры
+        if (bull === 4) {
+          this.msg = "Ты Победил!";
+          this.notice = true;
+
+          this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
+          this.nambersInCircle = this.inputValue;
+          this.inputValue = "";
+          return this.inpytArray.unshift(this.stepMsg);
         }
+
+        // Добовляем данные в массив
         this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
-        this.nambers = this.inputValue;
+        this.nambersInCircle = this.inputValue;
         this.inputValue = "";
         return this.inpytArray.unshift(this.stepMsg);
       }
+    },
+    newGame() {
+      this.inputValue = "";
+      this.inpytArray.length = 0;
+      this.randomNumber = numberFromArray();
+      this.notice = false;
+      this.nambersInCircle = "";
+      this.msg = "";
     },
   },
 };
@@ -86,7 +170,8 @@ export default {
   padding-top: 60px;
   font-size: 18px;
 }
-.title {
+.title,
+.subtitle {
   text-align: center;
 }
 .input__wrapper {
