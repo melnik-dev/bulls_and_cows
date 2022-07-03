@@ -133,7 +133,7 @@ export default {
       if (!isNaN(parsed)) {
         this.notice = false;
         let bull = bullCount(this.randomNumber, item);
-        let cow = cowCount(this.randomNumber, item);
+        let cow = cowCount(this.randomNumber, item) - bull;
         // Конец игры
         if (bull === 4) {
           this.msg = "Ты Победил!";
