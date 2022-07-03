@@ -3,7 +3,7 @@
     <h1 class="title">Быки и коровы</h1>
     <p class="subtitle">Компьютер уже что-то задумал. Играем!</p>
     <div class="input__wrapper">
-      <input class="input" type="text" v-model="inputValue" />
+      <input class="input" type="text" v-model="inputValue" @keyup.enter="askNumber(inputValue)" />
       <button class="btn" @click="askNumber(inputValue)">Сделать ход</button>
       <button class="btn" @click="newGame">Новая игра</button>
     </div>
@@ -11,7 +11,7 @@
     <ul class="nambers">
       <li class="nambers__item" v-for="(item, i) in nambersInCircle" :key="i" :class="classesBull[i]">{{ item }}</li>
     </ul>
-    <!-- <p>random Number: {{ randomNumber }}</p> -->
+    <p>random Number: {{ randomNumber }}</p>
     <ul class="items">
       <li class="items__value" v-for="(value, i) in inpytArray" :key="i">{{ value }}</li>
     </ul>
@@ -28,17 +28,26 @@ function getRandomNumArray() {
   }
   return randomNumArray;
 }
+// Уникальность в числе
+function getUniqueNum(num) {
+  num = String(num);
+  let set = new Set();
+
+  for (let i = 0; i < num.length; i++) {
+    set.add(num[i]);
+    if (set.size == 4) {
+      return true;
+    }
+  }
+
+  return false;
+}
 // Масив уникальных из рандомных чисел
 function getUniqueNumArray(array) {
   let uniqueNumArray = [];
   for (let i = 0; i < array.length; i++) {
     let element = array[i];
-    let set = new Set();
-
-    for (let j = 0; j < 4; j++) {
-      set.add(element[j]);
-    }
-    if (set.size == 4) {
+    if (getUniqueNum(element)) {
       uniqueNumArray.push(element);
     }
   }
@@ -49,6 +58,7 @@ function numberFromArray() {
   let num = getUniqueNumArray(getRandomNumArray());
   return num[0];
 }
+
 export default {
   name: "BullsAndCows",
   data() {
@@ -70,7 +80,7 @@ export default {
   },
   methods: {
     askNumber(item) {
-      // Проверка первого числа
+      // Проверка первого числа неравно 0
       if (item[0] == 0) {
         this.msg = "0 не может быть первым числом";
         return (this.notice = true);
@@ -79,23 +89,23 @@ export default {
       if (item.length > 4 || item.length < 4) {
         return (this.notice = true);
       }
+      // Числа в числе не повторяются
+      if (!getUniqueNum(item)) {
+        this.msg = "Цифры не должны повторяться";
+        return (this.notice = true);
+      }
 
       const parsed = parseInt(item);
       // Проверка число на строку
       if (isNaN(parsed)) {
         return (this.notice = true);
       }
-      // Проверка первого числа
+      // Проверка числа
       if (!isNaN(parsed)) {
         this.notice = false;
         let bull = 0;
         let cow = 0;
         for (let i = 0; i < 4; i++) {
-          // Числа в числе не повторяются
-          if (item[i] == item[i + 1]) {
-            this.msg = "Цифры не должны повторяться";
-            return (this.notice = true);
-          }
           // Считаем быков
           if (this.randomNumber[i] == item[i]) {
             bull++;
