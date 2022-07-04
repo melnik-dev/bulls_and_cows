@@ -9,7 +9,7 @@
     </div>
     <p class="notice" v-if="notice">{{ msg }}</p>
     <ul class="nambers">
-      <li class="nambers__item" v-for="(item, i) in nambersInCircle" :key="i" :class="classesBull[i]">{{ item }}</li>
+      <li class="nambers__item bull cow" v-for="(item, i) in nambersInCircle" :key="i">{{ item }}</li>
     </ul>
     <p style="display: none">random Number: {{ randomNumber }}</p>
     <ul class="items">
@@ -59,33 +59,33 @@ function numberFromArray() {
   return num[0];
 }
 // Считаем быков
-function bullCount(number, compare) {
-  number = String(number);
-  compare = String(compare);
-  let bull = 0;
+// function bullCount(number, compare) {
+//   number = String(number);
+//   compare = String(compare);
+//   let bull = 0;
 
-  for (let i = 0; i < number.length; i++) {
-    if (number[i] == compare[i]) {
-      bull++;
-    }
-  }
-  return bull;
-}
+//   for (let i = 0; i < number.length; i++) {
+//     if (number[i] == compare[i]) {
+//       bull++;
+//     }
+//   }
+//   return bull;
+// }
 // Считаем коров
-function cowCount(number, compare) {
-  number = String(number);
-  compare = String(compare);
-  let cow = 0;
+// function cowCount(number, compare) {
+//   number = String(number);
+//   compare = String(compare);
+//   let cow = 0;
 
-  for (let i = 0; i < number.length; i++) {
-    for (let j = 0; j < number.length; j++) {
-      if (number[i] == compare[j]) {
-        cow++;
-      }
-    }
-  }
-  return cow;
-}
+//   for (let i = 0; i < number.length; i++) {
+//     for (let j = 0; j < number.length; j++) {
+//       if (number[i] == compare[j]) {
+//         cow++;
+//       }
+//     }
+//   }
+//   return cow;
+// }
 export default {
   name: "BullsAndCows",
   data() {
@@ -97,12 +97,6 @@ export default {
       msg: "",
       stepMsg: "",
       nambersInCircle: "",
-      classesBull: [{ "bull-one": this.bullOneisActive }, { bullTwo: this.bullTwoisActive }, { bullThree: this.bullThreeisActive }, { bullFour: this.bullFourisActive }],
-      classesCow: ["cowOne", "cowTwo", "cowThree", "cowFour"],
-      bullOneisActive: true,
-      bullTwoisActive: false,
-      bullThreeisActive: false,
-      bullFourisActive: false,
     };
   },
   methods: {
@@ -132,8 +126,23 @@ export default {
       // Проверка числа и подсчет
       if (!isNaN(parsed)) {
         this.notice = false;
-        let bull = bullCount(this.randomNumber, item);
-        let cow = cowCount(this.randomNumber, item) - bull;
+        let bull = 0;
+        let cow = 0;
+        let numItem = document.querySelectorAll(".nambers__item");
+
+        for (let i = 0; i < this.randomNumber.length; i++) {
+          if (this.randomNumber[i] == item[i]) {
+            bull++;
+            numItem[i].classList.add("active-bull");
+          }
+          for (let j = 0; j < this.randomNumber.length; j++) {
+            if (this.randomNumber[i] == item[j]) {
+              cow++;
+              // numItem[i].classList.add("active-cow");
+            }
+          }
+        }
+
         // Конец игры
         if (bull === 4) {
           this.msg = "Ты Победил!";
@@ -144,7 +153,7 @@ export default {
           this.inputValue = "";
           return this.inpytArray.unshift(this.stepMsg);
         }
-
+        cow = cow - bull;
         // Добовляем данные в массив
         this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
         this.nambersInCircle = this.inputValue;
@@ -220,16 +229,10 @@ export default {
   text-align: center;
   line-height: 40px;
 }
-.cowOne,
-.cowTwo,
-.cowThree,
-.cowFour {
+.active-cow.cow {
   background: yellow;
 }
-.bullOne,
-.bullTwo,
-.bullThree,
-.bullFour {
-  background: red;
+.active-bull.bull {
+  background: green;
 }
 </style>
