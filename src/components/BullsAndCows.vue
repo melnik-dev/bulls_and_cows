@@ -86,6 +86,13 @@ function numberFromArray() {
 //   }
 //   return cow;
 // }
+function removeClass() {
+  let allItem = document.querySelectorAll(".nambers__item");
+  for (let i = 0; i < allItem.length; i++) {
+    allItem[i].classList.remove("active-bull");
+    allItem[i].classList.remove("active-cow");
+  }
+}
 export default {
   name: "BullsAndCows",
   data() {
@@ -96,11 +103,14 @@ export default {
       notice: false,
       msg: "",
       stepMsg: "",
-      nambersInCircle: "",
+      nambersInCircle: undefined,
     };
   },
   methods: {
-    askNumber(item) {
+    async askNumber(item) {
+      this.nambersInCircle = item;
+      await this.$nextTick();
+      let numItem = document.querySelectorAll(".nambers__item");
       // Проверка первого числа неравно 0
       if (item[0] == 0) {
         this.msg = "0 не может быть первым числом";
@@ -128,9 +138,9 @@ export default {
         this.notice = false;
         let bull = 0;
         let cow = 0;
-        let numItem = document.querySelectorAll(".nambers__item");
-
+        removeClass();
         for (let i = 0; i < this.randomNumber.length; i++) {
+          console.log(this.randomNumber + ":" + this.randomNumber[i]);
           if (this.randomNumber[i] == item[i]) {
             bull++;
             numItem[i].classList.add("active-bull");
@@ -138,7 +148,7 @@ export default {
           for (let j = 0; j < this.randomNumber.length; j++) {
             if (this.randomNumber[i] == item[j]) {
               cow++;
-              // numItem[i].classList.add("active-cow");
+              numItem[j].classList.add("active-cow");
             }
           }
         }
@@ -149,14 +159,12 @@ export default {
           this.notice = true;
 
           this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
-          this.nambersInCircle = this.inputValue;
           this.inputValue = "";
           return this.inpytArray.unshift(this.stepMsg);
         }
         cow = cow - bull;
         // Добовляем данные в массив
         this.stepMsg = `${item}: ${bull} бык, ${cow} коров`;
-        this.nambersInCircle = this.inputValue;
         this.inputValue = "";
         return this.inpytArray.unshift(this.stepMsg);
       }
@@ -166,8 +174,9 @@ export default {
       this.inpytArray.length = 0;
       this.randomNumber = numberFromArray();
       this.notice = false;
-      this.nambersInCircle = "";
+      this.nambersInCircle = undefined;
       this.msg = "";
+      this.stepMsg = "";
     },
   },
 };
