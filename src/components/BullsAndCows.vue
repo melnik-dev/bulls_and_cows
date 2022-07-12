@@ -7,8 +7,12 @@
       <button class="btn" @click="askNumber(inputValue)">Сделать ход</button>
       <button class="btn" @click="newGame">Новая игра</button>
     </div>
+    <p class="active-cow cow p-cow">Желтые - Коровы!</p>
+    <br />
+    <p class="active-bull bull p-bull">Зеленые - Быки!</p>
+    <br />
     <p class="notice" v-if="notice">{{ msg }}</p>
-    <ul class="nambers">
+    <ul class="nambers" v-if="String(nambersInCircle).length <= 4">
       <li class="nambers__item bull cow" v-for="(item, i) in nambersInCircle" :key="i">{{ item }}</li>
     </ul>
     <p style="display: none">random Number: {{ randomNumber }}</p>
@@ -214,7 +218,9 @@ export default {
 .items__value {
   padding: 6px 0;
 }
-.notice {
+.notice,
+.p-cow,
+.p-bull {
   font-size: 14px;
   background: rgb(248, 215, 218);
   color: rgb(114, 28, 36);
@@ -243,5 +249,9 @@ export default {
 }
 .active-bull.bull {
   background: green;
+}
+.p-cow,
+.p-bull {
+  display: inline-block;
 }
 </style>
